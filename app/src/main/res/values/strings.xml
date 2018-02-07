@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Homework 1</string>
+    <string name="welcomeString">Hello</string>
+    <string name="enterNumber">Enter</string>
+    <string name="dialNumber">Dial</string>
+    <string name="numberFormat">(xxx) xxx-xxxx</string>
+
+</resources>
