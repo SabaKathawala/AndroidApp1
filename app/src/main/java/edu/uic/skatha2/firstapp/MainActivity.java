@@ -17,7 +17,10 @@ public class MainActivity extends Activity {
     protected Button dialButton;
     private String phoneNumber;
     //flag to check if "Dial Number" should work
-    private boolean dialNumber = false;
+    private boolean isPhoneNumberPresent = false;
+
+    private static final int REQUEST_CODE_PHONE_NUMBER = 101;
+    private static final String EXTRA_PARAM_PHONE_NUMBER = "extra_param_phone_number";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +41,15 @@ public class MainActivity extends Activity {
 
         //5. Set up listeners for interactive views
         // Actual listeners are created below as instances of anonymous classes
-        enterButton.setOnClickListener(enterListener);
-        dialButton.setOnClickListener(dialListener);
+        enterButton.setOnClickListener(enterButtonListener);
+        dialButton.setOnClickListener(dialButtonListener);
 
         //6. Configure views and other initialization actions
 
     }
 
     // Listener for the "Enter Number" button
-    public View.OnClickListener enterListener = new View.OnClickListener() {
+    public View.OnClickListener enterButtonListener = new View.OnClickListener() {
 
         // Called when "Enter Number" button is clicked
         @Override
@@ -54,30 +57,29 @@ public class MainActivity extends Activity {
             //start second Activity
             //Explicit Intent
             Intent intent = new Intent(MainActivity.this, NumberEntryActivity.class) ;
-            startActivityForResult(intent,1);
+            startActivityForResult(intent,REQUEST_CODE_PHONE_NUMBER);
         }
     };
 
-    protected void onActivityResult(int code, int result_code, Intent intent) {
-        super.onActivityResult(code, result_code, intent);
-        switch (code) {
-            case 1:
-                //get phoneNumber from Intent Extras
-                phoneNumber = intent.getStringExtra("phoneNumber");
-                if (result_code == RESULT_OK) {
-                    dialNumber = true;
-                }
-                else if (result_code == RESULT_CANCELED) {
-                    dialNumber = false;
-                }
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        //get phoneNumber from Intent Extras
+        phoneNumber = intent.getStringExtra(EXTRA_PARAM_PHONE_NUMBER);
+        if (resultCode == RESULT_OK) {
+            isPhoneNumberPresent = true;
         }
+        else if (resultCode == RESULT_CANCELED) {
+            isPhoneNumberPresent = false;
+        }
+
     }
 
-    public View.OnClickListener dialListener = new View.OnClickListener() {
+    public View.OnClickListener dialButtonListener = new View.OnClickListener() {
 
         @Override
         public void onClick(View v) {
-            if(dialNumber) {
+            if(isPhoneNumberPresent) {
                 //implicit intent
                 Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+phoneNumber));
                 startActivity(intent);
@@ -89,8 +91,7 @@ public class MainActivity extends Activity {
                     message = "The number " + phoneNumber+ " entered is incorrect. " +
                             "Please try again with the correct input format: (xxx) xxx-xxxx";
                 }
-                int duration = Toast.LENGTH_LONG;
-                Toast.makeText(context, message, duration).show();
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         }
     };

@@ -16,9 +16,11 @@
         android:paddingRight="20dp"
         android:width="200dp"
         android:maxWidth="250dp"
-        android:inputType="none"
+        android:maxLines="1"
+        android:inputType="text"
         android:textSize="22sp"
         android:textColor="@android:color/holo_blue_dark"
+        android:imeOptions="actionDone"
         android:hint="@string/numberFormat">
 
     </EditText>
