@@ -18,11 +18,6 @@ public class NumberEntryActivity extends Activity {
     private static String PHONE_NUMBER_FORMAT = "\\(\\d{3}\\)\\s\\d{3}-\\d{4}";
     private static final String EXTRA_PARAM_PHONE_NUMBER = "extra_param_phone_number";
 
-    public String getTextField() {
-        //remove whitespaces
-        return textField.getText().toString().trim();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -50,52 +45,46 @@ public class NumberEntryActivity extends Activity {
 
         @Override
         public boolean onEditorAction(TextView v, int keyCode, KeyEvent event) {
-            // check if key pressed is Return/Done
-            Log.i("Key", "press");
-            if(keyCode == EditorInfo.IME_ACTION_DONE) {
-                returnToParentActivity();
+
+            // check if key pressed is Done
+            if(keyCode == EditorInfo.IME_ACTION_DONE || keyCode == KeyEvent.KEYCODE_BACK) {
+
+                //get phone number and remove trailing and leading whitespaces
+                String phoneNumber = textField.getText().toString().trim();
+
+                //set value in Intent  Extras
+                getIntent().putExtra(EXTRA_PARAM_PHONE_NUMBER, phoneNumber);
+
+                //set resultCode according in validation
+                setResult(isvalidPhoneNumber(phoneNumber) ? RESULT_OK : RESULT_CANCELED, getIntent());
+
+                //finish activity
+                finish();
             }
             return true;
         }
     };
 
-    private void returnToParentActivity() {
-        //get the value from EditText
-        String phoneNumber = getTextField();
-        //set Intent Extra
-        setIntentExtra(phoneNumber);
-        //setResult
-        setResultOnValidate(phoneNumber);
-        //finish the activity
-        finish();
-    }
-
-    private boolean validatePhoneNumber(String phoneNumber) {
+    private boolean isvalidPhoneNumber(String phoneNumber) {
         //regular expression used to test for correct format
         Pattern pattern = Pattern.compile(PHONE_NUMBER_FORMAT);
         Matcher match = pattern.matcher(phoneNumber);
         return match.matches();
     }
 
-    private void setResultOnValidate(String phoneNumber) {
-        //check if phone number is in the right format
-        if (validatePhoneNumber(phoneNumber)) {
-            setResult(RESULT_OK, getIntent());
-        }
-        else {
-            setResult(RESULT_CANCELED, getIntent());
-        }
-    }
-
-    //onPause
+    //handle back key
     public void onBackPressed() {
-        returnToParentActivity();
+        //get phone number and remove trailing and leading whitespaces
+        String phoneNumber = textField.getText().toString().trim();
+
+        //set value in Intent  Extra
+        getIntent().putExtra(EXTRA_PARAM_PHONE_NUMBER, phoneNumber);
+
+        //set resultCode according in validation
+        setResult(isvalidPhoneNumber(phoneNumber) ? RESULT_OK : RESULT_CANCELED, getIntent());
+
+        super.onBackPressed();
+
     }
 
-    private void setIntentExtra(String phoneNumber) {
-
-        Intent intent = getIntent();
-        //pass the value of phone number using Intent Extras
-        intent.putExtra(EXTRA_PARAM_PHONE_NUMBER, phoneNumber);
-    }
 }
